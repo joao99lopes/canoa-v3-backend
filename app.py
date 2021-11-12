@@ -1,42 +1,45 @@
-# using flask_restful
-from flask import Flask, jsonify, request
-from flask_restful import Resource, Api
+from flask import Flask, render_template, request
+from flask_migrate import Migrate
+from models import db, InfoModel
 
-# creating the flask app
 app = Flask(__name__)
-# creating an API object
-api = Api(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@192.168.1.206:5432/p06_teste"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
+migrate = Migrate(app, db)
 
 
-# making a class for a particular resource
-# the get, post methods correspond to get and post requests
-# they are automatically mapped by flask_restful.
-# other methods include put, delete, etc.
-class Hello(Resource):
-
-    # corresponds to the GET request.
-    # this function is called whenever there
-    # is a GET request for this resource
-    def get(self):
-        return jsonify({'message': 'hello world'})
-
-    # Corresponds to POST request
-    def post(self):
-        data = request.get_json()  # status code
-        return jsonify({'data': data}), 201
+@app.route('/signup')
+def form():
+    return render_template('signup.html')
 
 
-# another resource to calculate the square of a number
-class Square(Resource):
+@app.route('/login', methods=['POST', 'GET'])
+def login():
+    if request.method == 'GET':
+        return "Login via the login Form"
 
-    def get(self, num):
-        return jsonify({'square': num ** 2})
+    if request.method == 'POST':
+        name = request.form['name']
+        age = request.form['age']
+        email = request.form['email']
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
+        if confirm_password != password:
+            return "Passwords did not match<br>Password: '{}'\n<br>Confirm password: '{}'".format(password,confirm_password)
+        query_name = InfoModel.query.filter_by(name=name).first()
+        query_email = InfoModel.query.filter_by(email=email).first()
+        if query_email != None and query_name != None and query_email.email == email and query_name.name == name:
+            return "Username '{}' and Email '{}' are already in use".format(name,email)
+        elif query_email != None and query_email.email == email:
+            return "Email '{}' is already in use".format(email)
+        elif query_name != None and query_name.name == name:
+            return "Username '{}' is already in use".format(name)
+        new_user = InfoModel(name=name, age=age, email=email, password=password)
+        db.session.add(new_user)
+        db.session.commit()
+        return f"Done!!"
 
 
-# adding the defined resources along with their corresponding urls
-api.add_resource(Hello, '/')
-api.add_resource(Square, '/square/<int:num>')
-
-# driver function
 if __name__ == '__main__':
     app.run(debug=True)
