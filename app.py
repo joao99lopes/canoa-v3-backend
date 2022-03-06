@@ -7,18 +7,18 @@ from better_profanity import profanity
 import sshtunnel
 
 app = Flask(__name__)
-'''
+
 tunnel = sshtunnel.SSHTunnelForwarder(
     ('sigma.tecnico.ulisboa.pt'), ssh_username='ist193584', ssh_password='C8*Bdaz2',
     remote_bind_address=('db.tecnico.ulisboa.pt', 5432)
 )
 
 tunnel.start()
-'''
+
 # IST DB
 #db_str = "postgresql://ist193584:124jotPOC@127.0.0.1:{}/ist193584".format(tunnel.local_bind_port)
 # RASPI DB
-db_str = "postgresql://postgres:postgres@192.168.1.206:5432/p06_canoa_3"
+db_str = "postgresql://postgres:postgres@192.168.1.206:5432/p06_canoa"
 
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_str
@@ -155,6 +155,24 @@ def get_song_by_id():
         song_id = request.form['id']
         song = Song.query.filter_by(id=song_id).first()
         return json.dumps({"result": "SUCCESS", "data": song.__repr__()})
+
+
+@app.route('/api=add_chord_to_song', methods=['POST'])
+def add_chord_to_song():
+    song_id = request.form['song_id']
+    line = request.form['line']
+    col = request.form['col']
+    song = Song.query.filter_by(id=song_id).first()
+    pos = (line,col)
+    if pos in song.chords_list:
+        return json.dumps({"result": "ERROR: POSITION_ALREADY_IN_USE"})
+    else:
+        chord_list = dict(json.loads(song.chords_list))
+        new_chords_list[pos] = chord_id
+        song.chords_list = new_chords_list
+        db.session.commit()
+        return json.dumps({"result": "SUCCESS", "data": song.__repr__()})
+
 
 
 def check_profanity(args):
