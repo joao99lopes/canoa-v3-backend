@@ -8,11 +8,11 @@
       <jdbc-url>jdbc:postgresql://db.tecnico.ulisboa.pt:5432/ist193584</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="p06_canoa@localhost" uuid="8fc59ce6-197e-4448-abe6-0bc3859b1706">
+    <data-source source="LOCAL" name="p06_canoa@192.168.1.221" uuid="e7be8673-5c32-4ad4-b9c0-46832db09b90">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/p06_canoa</jdbc-url>
+      <jdbc-url>jdbc:postgresql://192.168.1.221:5432/p06_canoa</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

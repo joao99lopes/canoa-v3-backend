@@ -4,27 +4,28 @@ from flask import Flask, render_template, request
 from flask_migrate import Migrate
 from models import db, Chord, User, Song
 from better_profanity import profanity
+from collections import defaultdict
 import sshtunnel
 
 app = Flask(__name__)
-
+"""
 tunnel = sshtunnel.SSHTunnelForwarder(
     ('sigma.tecnico.ulisboa.pt'), ssh_username='ist193584', ssh_password='C8*Bdaz2',
     remote_bind_address=('db.tecnico.ulisboa.pt', 5432)
 )
 
 tunnel.start()
-
+"""
 # IST DB
 #db_str = "postgresql://ist193584:124jotPOC@127.0.0.1:{}/ist193584".format(tunnel.local_bind_port)
 # RASPI DB
-db_str = "postgresql://postgres:postgres@192.168.1.206:5432/p06_canoa"
+db_str = "postgresql://postgres:postgres@192.168.1.221:5432/p06_canoa"
 
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_str
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
-migrate = Migrate(app, db)
+migrate = Migrate(app, db, compare_type=True)
 
 profanity.load_censor_words()
 f = open("customBadWords.txt")
@@ -34,7 +35,7 @@ f.close()
 
 @app.route('/')
 def home():
-    result = Chord.query.all()
+#    result = Chord.query.all()
     return "Hello World"
 
 
@@ -48,9 +49,16 @@ def form():
         email = request.form['email']
         scout_group = request.form['scout_group']
         password = request.form['password']
+        if password != request.form['confirm_password']:
+            return json.dumps({"result": "ERROR_PASSWORDS_NOT_MATCH"})
         if User.query.filter_by(email=email).first() != None:
             return json.dumps({"result": "ERROR_DUPLICATE_EMAIL"})
-        new_user = User(first_name=first_name,last_name=last_name, email=email, password=password, scout_group=scout_group)
+        new_user = User(
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            password=password,
+            scout_group=scout_group)
         db.session.add(new_user)
         db.session.commit()
         return json.dumps({"result": "SUCCESS", "data": new_user.__repr__()})
@@ -68,18 +76,18 @@ def new_song():
     elif request.method == 'POST':
         title = request.form['title']
         lyrics = request.form['lyrics']
-        lyrics_list = lyrics.split('\n')
-        if check_profanity([title,lyrics]):
-            return json.dumps({"result": "ERROR: WATCH_YOUR_PROFANITY"})
+        lyrics_list = lyrics.split('\r\n')
+#        if check_profanity([title,lyrics]):
+#            return json.dumps({"result": "ERROR: WATCH_YOUR_PROFANITY"})
         chords_list = {}
-        for i in range(len(lyrics_list)):
-            for j in range(len(lyrics_list[i])):
-                pos = "{};{}".format(i, j)
-                chords_list[pos] = None
+#        for i in range(len(lyrics_list)):
+#            for j in range(len(lyrics_list[i])):
+#                pos = "{};{}".format(i, j)
+#                chords_list[pos] = None
 
         #categories = request.form['categories']
         #creator_id = request.form['creator_id']
-        new_song = Song(title=title,lyrics=json.dumps({'lyrics':lyrics_list}),chords_list=json.dumps(chords_list),categories=json.dumps({}),creator_id=1001)
+        new_song = Song(title=title,lyrics=lyrics_list,chords_list=json.dumps(chords_list),categories=json.dumps({}),creator_id=1001)
         db.session.add(new_song)
         db.session.commit()
         return json.dumps({"result": "SUCCESS", "data": new_song.__repr__()})
@@ -136,42 +144,63 @@ def load_test_user():
             return "SUPER USER SUCCESSFULLY ADDED"
         return "WRONG PASSWORD"
 
-@app.route('/api=get_available_songs', methods=['GET'])
+@app.route('/api=get_available_songs', methods=['GET', 'POST'])
 def get_available_songs():
-    res = {}
-    songs = Song.query.all()
+    res = []
+    if request.method == 'GET':
+        songs = Song.query.all()
+    elif request.method == 'POST':
+        search = request.json["search"]
+        songs = Song.query.filter(Song.title.contains(search)).all()
+
     for i in range(len(songs)):
-        id = songs[i].id
-        name = songs[i].title
-        res[id] = name
-    return json.dumps({"result": "SUCCESS", "data": res})
+        res.append(json.loads(songs[i].__repr__()))
+    return json.dumps({"result": "SUCCESS", "data": json.dumps(res)})
 
 
 @app.route('/api=get_song_by_id', methods=['GET','POST'])
 def get_song_by_id():
-    if request.method == "GET":
-        return render_template('get_song_by_id.html')
-    elif request.method == "POST":
-        song_id = request.form['id']
+    if request.method == "POST":
+        song_id = request.json['id']
         song = Song.query.filter_by(id=song_id).first()
         return json.dumps({"result": "SUCCESS", "data": song.__repr__()})
 
 
-@app.route('/api=add_chord_to_song', methods=['POST'])
+@app.route('/api=add_chord_to_song', methods=['GET','POST'])
 def add_chord_to_song():
-    song_id = request.form['song_id']
-    line = request.form['line']
-    col = request.form['col']
-    song = Song.query.filter_by(id=song_id).first()
-    pos = (line,col)
-    if pos in song.chords_list:
-        return json.dumps({"result": "ERROR: POSITION_ALREADY_IN_USE"})
-    else:
-        chord_list = dict(json.loads(song.chords_list))
-        new_chords_list[pos] = chord_id
-        song.chords_list = new_chords_list
+    if request.method == "GET":
+        return render_template('add_chord_to_song.html')
+    elif request.method == "POST":
+        print("recebi")
+        song_id = request.form['song_id']
+        line = request.form['line']
+        col = request.form['col']
+        key = f"{line}:{col}"
+        chord_id = request.form['chord_id']
+        song = Song.query.filter_by(id=song_id).first()
+        chords_list = json.loads(song.chords_list)
+        print("chords list", chords_list)
+        chords_list[key] = int(chord_id)
+        song.chords_list = json.dumps(chords_list)
         db.session.commit()
         return json.dumps({"result": "SUCCESS", "data": song.__repr__()})
+
+@app.route('/api=get_users', methods=['GET'])
+def get_users():
+    res = []
+    users = User.query.all()
+    for i in range(len(users)):
+        tmp = {}
+        id = users[i].id
+        first_name = users[i].first_name
+        last_name = users[i].last_name
+        email = users[i].email
+        tmp["id"] = id
+        tmp["first_name"] = first_name
+        tmp["last_name"] = last_name
+        tmp["email"] = email
+        res.append(tmp)
+    return json.dumps({"result": "SUCCESS", "data": res})
 
 
 
@@ -194,7 +223,20 @@ def check_profanity(args):
         else:
             raise ValueError("not list nor text. type='{}'".format(text.__class__))
     return censor
-
+"""
+@app.route('/api=print_song_by_id', methods=['GET', 'POST'])
+def print_song_by_id():
+    if request.method == "GET":
+        return render_template('print_song_by_id.html')
+    elif request.method == "POST":
+        song_id = request.form['id']
+        song = Song.query.filter_by(id=song_id).first()
+        chords = song.chords_list
+        res = song.title
+        for i in range(len(song.lyrics)):
+    
+    return json.dumps({"result": "SUCCESS", "data": song.__repr__()})
+"""
 
 if __name__ == '__main__':
     app.run(debug=True)

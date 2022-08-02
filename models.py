@@ -14,18 +14,18 @@ class User(db.Model):
     scout_group = db.Column(db.Integer(), nullable=False)
     email = db.Column(db.String(), unique=True, nullable=False)
     password = db.Column(db.String(), nullable=False)
-    is_admin = db.Column(db.Integer(), nullable=False)
+    is_admin = db.Column(db.Boolean(), default=False)
 
-    def __init__(self, first_name, last_name, scout_group, email, password, is_admin):
+    def __init__(self, first_name, last_name, scout_group, email, password):
         self.first_name = first_name
         self.last_name = last_name
         self.scout_group = scout_group
         self.email = email
         self.password = password
-        self.is_admin = is_admin
 
     def __repr__(self):
         return json.dumps({
+            "id": self.id,
             "first_name": self.first_name,
             "last_name": self.last_name,
             "email": self.email,
@@ -78,6 +78,7 @@ class Song(db.Model):
 
     def __repr__(self):
         return json.dumps({
+            "id": self.id,
             "title": self.title,
             "lyrics": self.lyrics,
             "chords_list": self.chords_list,
