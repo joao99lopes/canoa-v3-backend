@@ -76,6 +76,8 @@ def new_song():
         return render_template('new_song_form.html')
     elif request.method == 'POST':
         title = request.form['title']
+        if Song.query.filter_by(title=title).first() is not None:
+            return "TITLE ALREADY IN USE"
         lyrics = request.form['lyrics']
         lyrics_list = lyrics.split('\r\n')
 #        if check_profanity([title,lyrics]):
@@ -88,10 +90,10 @@ def new_song():
 
         #categories = request.form['categories']
         #creator_id = request.form['creator_id']
-        new_song = Song(title=title,lyrics=lyrics_list,chords_list=json.dumps(chords_list),categories=json.dumps({}),creator_id=1001)
-        db.session.add(new_song)
+        _new_song = Song(title=title,lyrics=lyrics_list,chords_list=json.dumps(chords_list),categories=[],creator_id=1001)
+        db.session.add(_new_song)
         db.session.commit()
-        return json.dumps({"result": "SUCCESS", "data": new_song.__repr__()})
+        return json.dumps({"result": "SUCCESS", "data": _new_song.__repr__()})
 
 
 @app.route('/load_chords')

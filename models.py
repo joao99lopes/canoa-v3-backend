@@ -28,7 +28,7 @@ class User(db.Model):
         self.email = email
         self.password = password
         self.verification_email_date = datetime.datetime.now()
-        self.playlists = json.dumps({})
+        self.playlists = {}
 
     def __repr__(self):
         return json.dumps({
@@ -72,9 +72,9 @@ class Song(db.Model):
 
     id = db.Column(db.Integer(), primary_key=True)
     title = db.Column(db.String(), unique=True, nullable=False)
-    lyrics = db.Column(db.JSON(), nullable=False)
+    lyrics = db.Column(db.ARRAY(db.String()), nullable=False)
     chords_list = db.Column(db.JSON(), nullable=False)
-    categories = db.Column(db.JSON(), nullable=False)
+    categories = db.Column(db.ARRAY(db.String()), nullable=False)
     creator_id = db.Column(db.Integer(), nullable=False)
     is_verified = db.Column(db.Boolean(), default=False, nullable=False)
     created_at = db.Column(db.Date(), nullable=False)
@@ -91,9 +91,8 @@ class Song(db.Model):
         self.is_verified = False    # not verified by default
         self.created_at = datetime.datetime.now()
         self.updated_at = datetime.datetime.now()
-        self.contributors = json.dumps({})
+        self.contributors = {}
         self.number_of_accesses = 0
-
 
     def __repr__(self):
         return json.dumps({
@@ -104,8 +103,8 @@ class Song(db.Model):
             "categories": self.categories,
             "creator_id": self.creator_id,
             "is_verified": self.is_verified,
-            "created_at": self.created_at,
-            "updated_at": self.updated_at,
+            "created_at": str(self.created_at),
+            "updated_at": str(self.updated_at),
             "contributors": self.contributors,
             "number_of_accesses": self.number_of_accesses
         })
