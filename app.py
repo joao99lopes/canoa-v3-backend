@@ -1,4 +1,5 @@
 import json
+import time
 
 from flask import Flask, render_template, request
 from flask_migrate import Migrate
@@ -19,7 +20,7 @@ tunnel.start()
 # IST DB
 #db_str = "postgresql://ist193584:124jotPOC@127.0.0.1:{}/ist193584".format(tunnel.local_bind_port)
 # RASPI DB
-db_str = "postgresql://postgres:postgres@192.168.1.221:5432/p06_canoa"
+db_str = "postgresql://postgres:postgres@192.168.0.17:5432/p06_canoa"
 
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_str
@@ -155,7 +156,7 @@ def get_available_songs():
 
     for i in range(len(songs)):
         res.append(json.loads(songs[i].__repr__()))
-    return json.dumps({"result": "SUCCESS", "data": json.dumps(res)})
+    return json.dumps({"result": "SUCCESS", "data": res})
 
 
 @app.route('/api=get_song_by_id', methods=['GET','POST'])
