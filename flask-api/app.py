@@ -20,8 +20,12 @@ tunnel.start()
 # IST DB
 #db_str = "postgresql://ist193584:124jotPOC@127.0.0.1:{}/ist193584".format(tunnel.local_bind_port)
 # RASPI DB
-db_str = "postgresql://postgres:postgres@192.168.0.17:5432/p06_canoa"
-
+db_user = "postgres"
+db_pw = "postgres"
+db_host_ip = "192.168.1.206"
+db_port = "5432"
+db_name = "p06_canoa"
+db_str = f"postgresql://{db_user}:{db_pw}@{db_host_ip}:{db_port}/{db_name}"
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_str
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
