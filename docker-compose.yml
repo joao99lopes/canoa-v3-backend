@@ -1,0 +1,42 @@
+version: '3.7'
+
+services:
+  flask-api:
+    build:
+      context: ./flask-api
+      dockerfile: Dockerfile
+    image: flask-api
+    tty: true
+    container_name: flask-api
+    environment:
+      FLASK_DEBUG: 1
+      FLASK_APP: /app/flask/app.py
+    volumes:
+      - ./flask-api:/app/flask
+      - ./flask-api/migrations:/app/flask/migrations
+    ports:
+      - "0.0.0.0:5000:5000"
+    networks:
+      - default
+
+  db:
+    image: postgres:14.1-alpine
+    tty: true
+    container_name: postgres-db
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5432:5432'
+    volumes: 
+      - db:/var/lib/postgresql/data
+
+networks:
+  default:
+    driver: bridge
+
+volumes:
+    flask-api-dev:
+    db:
+      driver: local

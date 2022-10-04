@@ -1,4 +1,9 @@
 songs:
-    - like/dislike
-    - report system
-    -
+    - db schema
+        .design correct db schema
+        .correct current db models and relations
+    - report system:
+        .report error in song => suggest correction
+        .report song
+    - accesses per song
+        .create model and relations

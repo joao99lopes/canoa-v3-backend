@@ -1,12 +1,12 @@
 import json
-import time
 
 from flask import Flask, render_template, request
 from flask_migrate import Migrate
 from models import db, Chord, User, Song
 from better_profanity import profanity
-from collections import defaultdict
-import sshtunnel
+import os
+#from collections import defaultdict
+#import sshtunnel
 
 app = Flask(__name__)
 """
@@ -22,9 +22,10 @@ tunnel.start()
 # RASPI DB
 db_user = "postgres"
 db_pw = "postgres"
-db_host_ip = "192.168.1.206"
+db_host_ip = "postgres-db"
+#db_host_ip = "192.168.1.206"
 db_port = "5432"
-db_name = "p06_canoa"
+db_name = "scoutify_db"
 db_str = f"postgresql://{db_user}:{db_pw}@{db_host_ip}:{db_port}/{db_name}"
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_str
@@ -33,9 +34,9 @@ db.init_app(app)
 migrate = Migrate(app, db, compare_type=True)
 
 profanity.load_censor_words()
-f = open("customBadWords.txt")
-profanity.add_censor_words(f.readlines())
-f.close()
+#f = open(os.path.join(os.getcwd(),"flask-api", "customBadWords.txt"))
+#profanity.add_censor_words(f.readlines())
+#f.close()
 
 
 @app.route('/')
