@@ -1,7 +1,8 @@
 from flask import Flask, jsonify
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
-
+from app.api import api_blueprint
+from app.models import db
 # creates an application that is named after the name of the file
 app = Flask(__name__)
 
@@ -14,7 +15,14 @@ db_str = f"postgresql://{db_user}:{db_pw}@{db_host_ip}:{db_port}/{db_name}"
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_str
 
-db = SQLAlchemy(app)
+db.init_app(app)
 migrate = Migrate(app, db)
 
+app.register_blueprint(api_blueprint, url_prefix='/api')
+
+@app.route('/')
+def index():
+    return jsonify("Hello World!"), 200
+
 from app import models
+from app import api
