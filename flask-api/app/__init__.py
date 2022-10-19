@@ -2,7 +2,7 @@ from flask import Flask, jsonify
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from app.api import api_blueprint
-from app.models import db
+from app.model import db
 # creates an application that is named after the name of the file
 app = Flask(__name__)
 

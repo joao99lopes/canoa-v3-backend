@@ -3,4 +3,4 @@ from flask import Blueprint
 api_blueprint = Blueprint('api', __name__)
 
 from .index import *
-from .chords import *
+from .chord import *
