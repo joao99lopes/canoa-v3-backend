@@ -1,63 +1,46 @@
-from datetime import datetime
-from typing import Optional, List
-from sqlalchemy.ext.hybrid import hybrid_property
 import json
+from datetime import datetime
+from os import access
+from typing import List, Optional
 
-from app.model import db, Song, Access, Contribution
+from app.model import Playlist, Song, access, contribution, db
+from sqlalchemy.ext.hybrid import hybrid_property
 
 
 class User(db.Model):
     __tablename__ = "user"
 
-    _id = db.Column(db.Integer, primary_key=True)
+    _id: int = db.Column('id', db.Integer, primary_key=True)
     
-    _first_name = db.Column(db.String, nullable=False)
-    _last_name = db.Column(db.String, nullable=False)
-    _username = db.Column(db.String, unique=True, nullable=False)
+    _first_name: str = db.Column('first_name', db.String, nullable=False)
+    _last_name: str = db.Column('last_name', db.String, nullable=False)
+    _username: str = db.Column('username', db.String, unique=True, nullable=False)
     
-    _email = db.Column(db.String, unique=True, nullable=False)
-    _password = db.Column(db.String, nullable=False)    #TODO: save hashed pwd
-    _verified_at = db.Column(db.DateTime)
-    
-    _is_admin = db.Column(db.Boolean, default=False)
+    _email: str = db.Column('email', db.String, unique=True, nullable=False)
+    _password: str = db.Column('password', db.String, nullable=False)    #TODO: save hashed pwd
+    _verified_at: datetime = db.Column('verified_at', db.DateTime)
+    _is_admin: bool = db.Column('is_admin', db.Boolean, default=False)
 
-    _accesses = db.relationship(Song.__name__, secondary=Access, backref='_accesses')
-    _playlists = db.Column(db.JSON) # relationship user-song
-    _contributions = db.relationship(Song.__name__, secondary=Contribution, backref='_contributions')
-    
-    _created_at = db.Column(db.DateTime, default=datetime.now)
-    _updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+    _created_at: datetime = db.Column('created_at', db.DateTime, default=datetime.now)
+    _updated_at: datetime = db.Column('updated_at', db.DateTime, default=datetime.now, onupdate=datetime.now)
+    _deleted_at: datetime = db.Column('deleted_at', db.Datetime)
 
-    def __init__(self, 
-                 first_name, 
-                 last_name, 
-                 username, 
-                 email, 
-                 password, 
-                 is_admin = False, 
-                 verified_at = None, 
-                 accesses = None, 
-                 playlists = None, 
-                 contributions = None, 
-                 created_at = datetime.now(), 
-                 updated_at = datetime.now()):
-        
+    _accesses: List[access] = db.relationship(Song.__name__, secondary=access, back_popuplates='_accesses')
+    _playlists: List[Playlist] = db.relationship(Playlist.__name, back_popuplates='_user_id')
+    _contributions: List[contribution] = db.relationship(Song.__name__, secondary=contribution, back_popuplates='_contributions')
+    
+
+    def __init__(self, first_name, last_name, username, email, password, is_admin = False):
         self._first_name = first_name
         self._last_name = last_name
         self._last_name = last_name
         self._username = username
         self._email = email
         self._password = password
-        self._verified_at = verified_at
         self._is_admin = is_admin
-        self._accesses = accesses
-        self._playlists = playlists
-        self._contributions = contributions
-        self._created_at = created_at
-        self._updated_at = updated_at
 
 
-    def verified_at_repr(self) -> str:
+    def verified_repr(self) -> str:
         if self._verified_at is not None:
             self._verified_at.strftime("%d-%m-%Y %H:%M")
         return self._verified_at
@@ -71,7 +54,7 @@ class User(db.Model):
             "username": self._username,
             "email": self._email,
             "password": self._password,
-            'verified_at': self.verified_at_repr(),
+            'verified_at': self.verified_repr(),
             'is_admin': self._is_admin,
             'accesses': self._accesses,
             "playlists": self._playlists,
@@ -116,7 +99,7 @@ class User(db.Model):
         return self._is_admin
     
     @hybrid_property
-    def accesses(self) -> Optional[Access.__class__]:
+    def accesses(self) -> Optional[access.__class__]:
         return self._accesses
     
     @hybrid_property
@@ -128,7 +111,7 @@ class User(db.Model):
         return self._playlists
 
     @hybrid_property
-    def contributions(self) -> List[Contribution.__class__]:
+    def contributions(self) -> List[contribution.__class__]:
         return self._contributions
     
 

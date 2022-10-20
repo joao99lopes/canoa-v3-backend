@@ -1,9 +1,9 @@
 import json
 from datetime import datetime
-from sqlalchemy.ext.hybrid import hybrid_property
 from typing import List, Optional
 
-from app.model import db, User, Access, Contribution
+from app.model import Access, Contribution, User, db
+from sqlalchemy.ext.hybrid import hybrid_property
 
 user_fk: str = f'{User.__tablename__}.id'
 
@@ -11,43 +11,38 @@ user_fk: str = f'{User.__tablename__}.id'
 class Song(db.Model):
     __tablename__ = "song"
 
-    _id = db.Column(db.Integer, primary_key=True)
+    _id: int = db.Column('id', db.Integer, primary_key=True)
     
-    _title = db.Column(db.String, unique=True, nullable=False)
-    _lyrics = db.Column(db.ARRAY(db.String), nullable=False)
-    _creator_id = db.Column(db.Integer, nullable=False)
+    _title: str = db.Column('title', db.String, unique=True, nullable=False)
+    _lyrics: str = db.Column('lyrics', db.ARRAY(db.String), nullable=False)
+    _creator_id: int = db.Column('creator_id', db.Integer, db.ForeignKey(user_fk), nullable=False)
+    _verified_at: datetime = db.Column('verified_at', db.DateTime)
     
-    _verified_at = db.Column(db.DateTime)
-    
-    # TODO: this might be better as relationships (?)
-    _chords = db.Column(db.JSON)
-    _categories = db.Column(db.ARRAY(db.String))
+    _chords = db.Column('chords', db.JSON)    # TODO: fix chords
+    _categories: List[str] = db.Column('categories', db.ARRAY(db.String))
 
-    _created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
-    _updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
+    _created_at: datetime = db.Column('created_at', db.DateTime, default=datetime.now)
+    _updated_at: datetime = db.Column('updated_at', db.DateTime, default=datetime.now, onupdate=datetime.now)
+    _deleted_at: datetime = db.Column('deleted_at', db.Datetime)
     
     # TODO: turn this into relationships
-    _contributions = db.relationship(User.__name__, secondary=Contribution, backref='_contributions')
-    _accesses = db.relationship(User.__name__, secondary=Access, backref='_accesses')
+    _contributions = db.relationship(User.__name__, secondary=Contribution, back_popuplates='_contributions')
+    _accesses = db.relationship(User.__name__, secondary=Access, back_popuplates='_accesses')
+
 
     def __init__(self, 
                  title, 
                  lyrics, 
                  creator_id, 
-                 verified_at = None, 
                  chords = None, 
-                 categories = None,
-                 contributions = None,
-                 accesses = None):
+                 categories = None):
         
         self._title = title
         self._lyrics = lyrics
         self._creator_id = creator_id
-        self._verified_at = verified_at
         self._chords = chords
         self._categories = categories
-        self._contributions = contributions
-        self._accesses = accesses
+
 
     def __repr__(self):
         return json.dumps({
