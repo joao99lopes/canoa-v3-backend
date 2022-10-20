@@ -3,10 +3,10 @@ from datetime import datetime
 from typing import List
 import json
 
-from app.model import Song, User, db
+from app.model import db
 
-user_fk = f"{User.__tablename__}"
-song_fk = f"{Song.__tablename__}"
+user_fk = "user.id"
+song_fk = "song.id"
 
 class Playlist(db.Model):
     __tablename__ = 'playlist'

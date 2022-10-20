@@ -1,6 +1,7 @@
 from app.api import api_blueprint
-from flask import request, jsonify
-from app.model import db, Chord
+from flask import jsonify
+from app.model import db
+from app.model.chord import Chord
 
 PATH = '/chords'
 

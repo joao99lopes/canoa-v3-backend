@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from app.model import db, User, Song
+from app.model import db
 
-user_fk: str = f"{User.__tablename__}"
-song_fk: str = f"{Song.__tablename__}"
+user_fk: str = "user.id"
+song_fk: str = "song.id"
 
 access = db.Table(
     "access",

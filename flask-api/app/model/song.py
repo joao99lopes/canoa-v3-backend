@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from typing import List, Optional
 
-from app.model import Access, Contribution, User, db
+from app.model import access, contribution, User, db
 from sqlalchemy.ext.hybrid import hybrid_property
 
 user_fk: str = f'{User.__tablename__}.id'
@@ -26,8 +26,8 @@ class Song(db.Model):
     _deleted_at: datetime = db.Column('deleted_at', db.Datetime)
     
     # TODO: turn this into relationships
-    _contributions = db.relationship(User.__name__, secondary=Contribution, back_popuplates='_contributions')
-    _accesses = db.relationship(User.__name__, secondary=Access, back_popuplates='_accesses')
+    _contributions = db.relationship(User.__name__, secondary=contribution, back_popuplates='_contributions')
+    _accesses = db.relationship(User.__name__, secondary=access, back_popuplates='_accesses')
 
 
     def __init__(self, 
@@ -100,11 +100,11 @@ class Song(db.Model):
         return self._updated_at
     
     @hybrid_property
-    def contributions(self) -> List[Contribution.__class__]:
+    def contributions(self) -> List[contribution.__class__]:
         return self._contributions
     
     @hybrid_property
-    def accesses(self) -> List[Access.__class__]:
+    def accesses(self) -> List[access.__class__]:
         return self._accesses
         
     @hybrid_property

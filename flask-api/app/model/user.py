@@ -1,6 +1,5 @@
 import json
 from datetime import datetime
-from os import access
 from typing import List, Optional
 
 from app.model import Playlist, Song, access, contribution, db
