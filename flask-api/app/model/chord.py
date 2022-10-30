@@ -1,10 +1,10 @@
 import json
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from app.model import db
+from app.database import db
 
 class Chord(db.Model):
-    __tablename__ = "chords"
+    __tablename__ = 'chord'
 
     _id: int = db.Column('id', db.Integer, primary_key=True)
     _name: str = db.Column('name', db.String, nullable=False)

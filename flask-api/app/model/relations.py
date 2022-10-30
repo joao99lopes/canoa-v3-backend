@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from app.model import db
+from app.database import db
 
 user_fk: str = "user.id"
 song_fk: str = "song.id"
@@ -10,7 +10,7 @@ access = db.Table(
     db.Column('id', db.Integer, primary_key=True),
     db.Column('user_id', db.Integer, db.ForeignKey(user_fk)),
     db.Column('song_id', db.Integer, db.ForeignKey(song_fk)),
-    db.Column('created_at', db.Datetime, default=datetime.now)
+    db.Column('created_at', db.DateTime, default=datetime.now)
     )
 
 contribution = db.Table(
@@ -18,7 +18,7 @@ contribution = db.Table(
     db.Column('id', db.Integer, primary_key=True),
     db.Column('user_id', db.Integer, db.ForeignKey(user_fk)),
     db.Column('song_id', db.Integer, db.ForeignKey(song_fk)),
-    db.Column('created_at', db.Datetime, default=datetime.now),
+    db.Column('created_at', db.DateTime, default=datetime.now),
     db.Column('lyrics', db.ARRAY(db.String), nullable=False)
     )
 

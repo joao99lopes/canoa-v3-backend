@@ -2,14 +2,15 @@ import json
 from datetime import datetime
 from typing import List, Optional
 
-from app.model import access, contribution, User, db
+from app.database import db
+from app.model.relations import access, contribution
 from sqlalchemy.ext.hybrid import hybrid_property
 
-user_fk: str = f'{User.__tablename__}.id'
+user_fk: str = 'user.id'
 
 
 class Song(db.Model):
-    __tablename__ = "song"
+    __tablename__ = 'song'
 
     _id: int = db.Column('id', db.Integer, primary_key=True)
     
@@ -23,11 +24,11 @@ class Song(db.Model):
 
     _created_at: datetime = db.Column('created_at', db.DateTime, default=datetime.now)
     _updated_at: datetime = db.Column('updated_at', db.DateTime, default=datetime.now, onupdate=datetime.now)
-    _deleted_at: datetime = db.Column('deleted_at', db.Datetime)
+    _deleted_at: datetime = db.Column('deleted_at', db.DateTime)
     
     # TODO: turn this into relationships
-    _contributions = db.relationship(User.__name__, secondary=contribution, back_popuplates='_contributions')
-    _accesses = db.relationship(User.__name__, secondary=access, back_popuplates='_accesses')
+    _contributions = db.relationship("User", secondary=contribution, back_populates='_contributions')
+    _accesses = db.relationship("User", secondary=access, back_populates='_accesses')
 
 
     def __init__(self, 
@@ -111,9 +112,6 @@ class Song(db.Model):
     def accesses_count(self) -> int:
         return len(self._accesses)
     
-
-    
-
     
 
     

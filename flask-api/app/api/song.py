@@ -1,19 +1,20 @@
 from flask import request, render_template, jsonify
 import json
-from pydantic import BaseModel
+#from pydantic import BaseModel
 
 from app.api import api_blueprint
-from app.model import db, Song
+from app.database import db
+from app.model.song import Song
 
 @api_blueprint.route('/new_song', methods=['GET'])
 def new_song_request():
     return render_template('new_song_form.html')
 
-
+"""
 class NewReservationPost(BaseModel):
     title: str
     lyrics: str
-    
+    """
     
     
 # TODO: check lyrics and title profanity

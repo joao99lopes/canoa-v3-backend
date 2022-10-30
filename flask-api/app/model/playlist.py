@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import List
 import json
 
-from app.model import db
+from app.database import db
 
 user_fk = "user.id"
 song_fk = "song.id"

@@ -2,12 +2,13 @@ import json
 from datetime import datetime
 from typing import List, Optional
 
-from app.model import Playlist, Song, access, contribution, db
+from app.database import db
+from app.model import Playlist, access, contribution
 from sqlalchemy.ext.hybrid import hybrid_property
 
 
 class User(db.Model):
-    __tablename__ = "user"
+    __tablename__ = 'user'
 
     _id: int = db.Column('id', db.Integer, primary_key=True)
     
@@ -24,9 +25,9 @@ class User(db.Model):
     _updated_at: datetime = db.Column('updated_at', db.DateTime, default=datetime.now, onupdate=datetime.now)
     _deleted_at: datetime = db.Column('deleted_at', db.Datetime)
 
-    _accesses: List[access] = db.relationship(Song.__name__, secondary=access, back_popuplates='_accesses')
-    _playlists: List[Playlist] = db.relationship(Playlist.__name, back_popuplates='_user_id')
-    _contributions: List[contribution] = db.relationship(Song.__name__, secondary=contribution, back_popuplates='_contributions')
+    _accesses: List[access] = db.relationship("Song", secondary=access, back_populates='_accesses')
+    _playlists: List[Playlist] = db.relationship(Playlist.__name, back_populates='_user_id')
+    _contributions: List[contribution] = db.relationship("Song", secondary=contribution, back_populates='_contributions')
     
 
     def __init__(self, first_name, last_name, username, email, password, is_admin = False):
@@ -122,4 +123,3 @@ class User(db.Model):
     def updated_at(self) -> Optional[datetime]:
         return self._updated_at
     
-
