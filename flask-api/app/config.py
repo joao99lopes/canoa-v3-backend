@@ -6,3 +6,4 @@ class DBConfig():
     DB_ADDRESS = 'postgres-db'
     DB_NAME = 'scoutify_db'
     SQLALCHEMY_DATABASE_URI = f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_ADDRESS}/{DB_NAME}'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
