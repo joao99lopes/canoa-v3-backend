@@ -2,16 +2,18 @@ from app.api import api_blueprint
 from flask import jsonify
 from app.database import db
 from app.model.chord import Chord
+from flask.blueprints import Blueprint
 
-PATH = '/chords'
+chord_blueprint = Blueprint('chord', __name__)
+api_blueprint.register_blueprint(chord_blueprint, url_prefix='/chord')
 
 
-@api_blueprint.route(f'{PATH}/', methods=['GET'])
+@chord_blueprint.route('/', methods=['GET'])
 def index():
-    return jsonify(f"Hello World from {PATH}!"), 200
+    return jsonify("Hello World from /chord!"), 200
 
 
-@api_blueprint.route(f'{PATH}/load', methods=['GET'])
+@chord_blueprint.route('/load', methods=['GET'])
 def load_chords():
     if len(Chord.query.all()) != 0:
         return jsonify(msg="Chords already on db"), 403

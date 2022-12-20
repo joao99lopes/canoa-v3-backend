@@ -18,12 +18,11 @@ class Chord(db.Model):
         self._representation = representation
 
     def __repr__(self):
-        return {
-            "id": self._id,
+        return json.dumps({
             "name": self._name,
             "is_minor": self._is_minor,
             "representation": self._representation
-        }
+        })
         
     @hybrid_property
     def id(self) -> int:

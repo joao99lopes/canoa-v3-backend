@@ -5,3 +5,4 @@ api_blueprint = Blueprint('api', __name__)
 
 from .chord import *
 from .song import *
+from .user import *

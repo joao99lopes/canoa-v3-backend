@@ -1,6 +1,6 @@
 from sqlalchemy.ext.hybrid import hybrid_property
 from datetime import datetime
-from typing import List, Optional
+from typing import List
 import json
 
 from app.database import db
@@ -14,9 +14,9 @@ class Playlist(db.Model):
     _name = db.Column('name', db.String, nullable=False)
     _user_id = db.Column('user_id', db.Integer, db.ForeignKey(user_fk), nullable=False)
     _song_ids = db.Column('song_ids', db.ARRAY(db.Integer, db.ForeignKey(song_fk)))
-    _created_at = db.Column('created_at', db.DateTime, default=datetime.now)
-    _updated_at = db.Column('updated_at', db.DateTime, onupdate=datetime.now)
-    _deleted_at = db.Column('deleted_at', db.DateTime)
+    _created_at = db.Column('created_at', db.Datetime, default=datetime.now)
+    _updated_at = db.Column('updated_at', db.Datetime, onupdate=datetime.now)
+    _deleted_at = db.Column('deleted_at', db.Datetime)
     
 
     def __init__(self, name, user_id):
@@ -24,7 +24,7 @@ class Playlist(db.Model):
         self._user_id = user_id
         
     def __repre__(self):
-        return {
+        return json.dumps({
             'id': self._id,
             'name': self._name,
             'user_id': self._user_id,
@@ -32,7 +32,7 @@ class Playlist(db.Model):
             'created_at': self._created_at,
             'updated_at': self._updated_at,
             'deleted_at': self._deleted_at,
-        }
+        })
         
     @hybrid_property
     def id(self) -> int:
@@ -55,10 +55,10 @@ class Playlist(db.Model):
         return self._created_at
 
     @hybrid_property
-    def updated_at(self) -> Optional[datetime]:
+    def updated_at(self) -> datetime:
         return self._updated_at
     
     @hybrid_property
-    def deleted_at(self) -> Optional[datetime]:
+    def deleted_at(self) -> datetime:
         return self._deleted_at
 

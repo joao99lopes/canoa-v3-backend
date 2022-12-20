@@ -3,8 +3,7 @@ from datetime import datetime
 from typing import List, Optional
 
 from app.database import db
-from app.model.playlist import Playlist
-from app.model.relations import access, contribution
+from app.model import Playlist, access, contribution
 from sqlalchemy.ext.hybrid import hybrid_property
 
 
@@ -24,11 +23,11 @@ class User(db.Model):
 
     _created_at: datetime = db.Column('created_at', db.DateTime, default=datetime.now)
     _updated_at: datetime = db.Column('updated_at', db.DateTime, onupdate=datetime.now)
-    _deleted_at: datetime = db.Column('deleted_at', db.DateTime)
+    _deleted_at: datetime = db.Column('deleted_at', db.Datetime)
 
-    _accesses = db.relationship("app.model.song.Song", secondary=access, back_populates='_accesses')
-    _playlists = db.relationship("app.model.playlist.Playlist")
-    _contributions = db.relationship("app.model.song.Song", secondary=contribution, back_populates='_contributions')
+    _accesses: List[access] = db.relationship("Song", secondary=access, back_populates='_accesses')
+    _playlists: List[Playlist] = db.relationship(Playlist.__name, back_populates='_user_id')
+    _contributions: List[contribution] = db.relationship("Song", secondary=contribution, back_populates='_contributions')
     
 
     def __init__(self, first_name, last_name, username, email, password, is_admin = False):
@@ -39,23 +38,23 @@ class User(db.Model):
         self._email = email
         self._password = password
         self._is_admin = is_admin
-        
-        
+
+                
     def __repr__(self):
-        return {
+        return json.dumps({
             "id": self._id,
             "first_name": self._first_name,
             "last_name": self._last_name,
             "username": self._username,
             "email": self._email,
             "password": self._password,
-            'verified_at': self._verified_at,
+            'verified_at': self.verified_repr(),
             'is_admin': self._is_admin,
             'accesses': self._accesses,
             "playlists": self._playlists,
             "created_at": self._created_at,
             "updated_at": self._updated_at,
-        }
+        })
 
     @hybrid_property
     def id(self) -> int:
@@ -102,11 +101,11 @@ class User(db.Model):
         return len(self._accesses)
 
     @hybrid_property
-    def playlists(self) -> List[Playlist.__class__]:
+    def playlists(self) -> List[Playlist]:
         return self._playlists
 
     @hybrid_property
-    def contributions(self) -> List[contribution.__class__]:
+    def contributions(self) -> List[contribution]:
         return self._contributions
     
 

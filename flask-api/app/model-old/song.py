@@ -27,8 +27,9 @@ class Song(db.Model):
     _deleted_at: datetime = db.Column('deleted_at', db.DateTime)
     
     # TODO: turn this into relationships
-    _contributions = db.relationship("app.model.user.User", secondary=contribution, back_populates='_contributions')
-    _accesses = db.relationship("app.model.user.User", secondary=access, back_populates='_accesses')
+    _contributions = db.relationship("User", secondary=contribution, back_populates='_contributions')
+    _accesses = db.relationship("User", secondary=access, back_populates='_accesses')
+
 
     def __init__(self, 
                  title, 
@@ -45,7 +46,7 @@ class Song(db.Model):
 
 
     def __repr__(self):
-        return {
+        return json.dumps({
             "id": self._id,
             "title": self._title,
             "lyrics": self._lyrics,
@@ -55,10 +56,9 @@ class Song(db.Model):
             "verified_at": self._verified_at,
             "created_at": self._created_at,
             "updated_at": self._updated_at,
-            "deleted_at": self._deleted_at,
             "contributions": self._contributions,
-            "accesses": self._accesses,
-        }
+            "accesses": self._accesses
+        })
         
     @hybrid_property
     def id(self) -> int:
@@ -101,11 +101,11 @@ class Song(db.Model):
         return self._updated_at
     
     @hybrid_property
-    def contributions(self) -> List[contribution.__class__]:
+    def contributions(self) -> List[contribution]:
         return self._contributions
     
     @hybrid_property
-    def accesses(self) -> List[access.__class__]:
+    def accesses(self) -> List[access]:
         return self._accesses
         
     @hybrid_property

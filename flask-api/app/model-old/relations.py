@@ -7,7 +7,6 @@ song_fk: str = "song.id"
 
 access = db.Table(
     "access",
-    db.Model.metadata,
     db.Column('id', db.Integer, primary_key=True),
     db.Column('user_id', db.Integer, db.ForeignKey(user_fk)),
     db.Column('song_id', db.Integer, db.ForeignKey(song_fk)),
@@ -16,7 +15,6 @@ access = db.Table(
 
 contribution = db.Table(
     "contribution",
-    db.Model.metadata,
     db.Column('id', db.Integer, primary_key=True),
     db.Column('user_id', db.Integer, db.ForeignKey(user_fk)),
     db.Column('song_id', db.Integer, db.ForeignKey(song_fk)),
