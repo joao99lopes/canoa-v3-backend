@@ -1,8 +1,8 @@
-"""added indian boy migrations
+"""first migration
 
-Revision ID: dcab832a4d93
+Revision ID: bf89a05c1f3e
 Revises: 
-Create Date: 2022-12-20 17:19:24.835813
+Create Date: 2022-12-21 16:44:41.631415
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'dcab832a4d93'
+revision = 'bf89a05c1f3e'
 down_revision = None
 branch_labels = None
 depends_on = None

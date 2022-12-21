@@ -16,7 +16,7 @@ def index():
 @chord_blueprint.route('/load', methods=['GET'])
 def load_chords():
     if len(Chord.query.all()) != 0:
-        return jsonify(msg="Chords already on db"), 403
+        return jsonify(msg="'Chord' table not empty"), 403
     chords_list = [
         Chord(name='Do Maior', representation='C', is_minor=0),
         Chord(name='Do Sustenido Maior', representation='C#', is_minor=0),

@@ -1,9 +1,9 @@
 import requests
-
+base_url='http://localhost:5000/api/'
 test = {
-    'title': 'this is afaa new svasfsaassdsdtitle',
-    'lyrics': 'omg this afsfasfsong is sosdafgsdg wow again'
+    'title': 'this is the title',
+    'lyrics': 'omg this a song is so wow again'
 }
-x = requests.get('http://localhost:5000/api/song/get_title_from_text', json = test, )
+x = requests.post(f'{base_url}song/new', json = test, )
 
 print(x.text)
