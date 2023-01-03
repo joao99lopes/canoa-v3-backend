@@ -29,7 +29,7 @@ def add_new_song():
         # check if there's a song with the given title
         if Song.query.filter_by(title=title).first() is not None:
             return jsonify(error="Title already in use"), 406
-        lyrics_list = lyrics.split('\r\n')
+        lyrics_list = lyrics.split('\n')
         # check if there's a song with the same lyrics
         song: Song = Song.query.filter_by(lyrics=lyrics_list).first()
         if song is not None:
@@ -61,8 +61,8 @@ def get_songs():
 @song_blueprint.route('/get_by_id', methods=['GET'])
 def get_song_by_id():
     try:
-        if "id" in list(request.json.keys()):
-            song_id = int(request.json["id"])
+        if "id" in list(request.args.keys()):
+            song_id = int(request.args["id"])
             res = Song.query.filter_by(id=song_id).first()
             if not res:
                 return jsonify(error=f"No song with id {song_id}"), 406
@@ -73,12 +73,14 @@ def get_song_by_id():
         return jsonify(error="Server error"), 418
 
 
-@song_blueprint.route('/get_title_from_text', methods=['GET'])
+@song_blueprint.route('/get_songs_with_title_match', methods=['GET'])
 def get_songs_with_title_match():
     try:
         res = []
-        if "text" in list(request.json.keys()):
-            text = str(request.json['text'])
+        test = request.args
+        print(list(test.keys()))
+        if "text" in list(request.args.keys()):
+            text = str(request.args['text'])
             songs: list = Song.query.filter(Song.title.contains(text)).all()
             for i in range(len(songs)):
                 res.append(songs[i].__repr__())

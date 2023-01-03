@@ -1,8 +1,16 @@
 import requests
 base_url='http://localhost:5000/api/'
+
+# for i in range(20):
+lyrics = "aaa"
+
+for i in range(10):
+    lyrics += f"\n{i}"
+for i in range(3):
+    lyrics += f"\n{lyrics}"
 test = {
-    'title': 'this is the title',
-    'lyrics': 'omg this a song is so wow again'
+    'title': f'teste lyrics grande7',
+    'lyrics': lyrics
 }
 
 # test = {
